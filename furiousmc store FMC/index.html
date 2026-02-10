@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FuriousMC Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  background:#0b0b0b;
+  color:white;
+  font-family:Arial, sans-serif;
+}
+
+header{
+  text-align:center;
+  padding:20px;
+  background:#111;
+  border-bottom:1px solid #222;
+}
+
+header h1{
+  margin:0;
+  color:gold;
+}
+
+header p{
+  opacity:.7;
+}
+
+.section{
+  padding:20px;
+}
+
+.section h2{
+  border-left:4px solid gold;
+  padding-left:10px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
+}
+
+.card{
+  background:#161616;
+  padding:15px;
+  border-radius:10px;
+  border:1px solid #222;
+}
+
+.card h3{
+  margin:0;
+  color:gold;
+}
+
+.card p{
+  font-size:14px;
+  opacity:.8;
+}
+
+.card button{
+  margin-top:10px;
+  width:100%;
+  padding:10px;
+  background:gold;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* POPUP */
+#popup{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  align-items:center;
+  justify-content:center;
+}
+
+#box{
+  background:#161616;
+  width:320px;
+  padding:20px;
+  border-radius:10px;
+  border:1px solid #333;
+}
+
+input{
+  width:100%;
+  padding:8px;
+  background:#111;
+  border:1px solid #333;
+  color:white;
+  margin-top:8px;
+}
+
+.btn{
+  width:100%;
+  padding:10px;
+  background:gold;
+  border:none;
+  font-weight:bold;
+  margin-top:10px;
+  cursor:pointer;
+}
+
+/* PAYMENT BOX */
+.pay-box{
+  border:1px solid #333;
+  padding:12px;
+  border-radius:8px;
+  margin-top:10px;
+  cursor:pointer;
+  background:#111;
+}
+
+.pay-box:hover{
+  border-color:gold;
+}
+
+.pay-box.active{
+  border-color:gold;
+  background:#1f1f1f;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>FuriousMC Store</h1>
+<p>Official FuriousMC server store</p>
+</header>
+
+<div class="section">
+<h2>Ranks</h2>
+<div class="grid">
+
+<div class="card">
+<h3>DIAMOND</h3>
+<p>2 Months Rank</p>
+<p>$14.99</p>
+<button onclick="buy('Diamond Rank',14.99)">PURCHASE</button>
+</div>
+
+<div class="card">
+<h3>EMERALD</h3>
+<p>1 Month Rank</p>
+<p>$8.99</p>
+<button onclick="buy('Emerald Rank',8.99)">PURCHASE</button>
+</div>
+
+<div class="card">
+<h3>GOLD</h3>
+<p>1 Month Rank</p>
+<p>$6.49</p>
+<button onclick="buy('Gold Rank',6.49)">PURCHASE</button>
+</div>
+
+<div class="card">
+<h3>COPPER</h3>
+<p>Basic Starter Rank (1 Month)</p>
+<p>$2.59</p>
+<button onclick="buy('Copper Rank',2.59)">PURCHASE</button>
+</div>
+
+</div>
+</div>
+
+<div class="section">
+<h2>Gems</h2>
+<div class="grid">
+
+<div class="card">
+<h3>670 Gems</h3>
+<p>$2.45</p>
+<button onclick="buy('670 Gems',2.45)">PURCHASE</button>
+</div>
+
+<div class="card">
+<h3>1350 Gems</h3>
+<p>$3.59</p>
+<button onclick="buy('1350 Gems',3.59)">PURCHASE</button>
+</div>
+
+<div class="card">
+<h3>2775 Gems</h3>
+<p>$4.99</p>
+<button onclick="buy('2775 Gems',4.99)">PURCHASE</button>
+</div>
+
+<div class="card">
+<h3>6357 Gems</h3>
+<p>$8.99</p>
+<button onclick="buy('6357 Gems',8.99)">PURCHASE</button>
+</div>
+
+</div>
+</div>
+
+<!-- POPUP -->
+<div id="popup">
+  <div id="box">
+    <h3 id="item"></h3>
+    <p>Total: $<span id="price"></span></p>
+
+    <input id="coupon" placeholder="Coupon code">
+    <button class="btn" onclick="applyCoupon()">Apply Coupon</button>
+
+    <div class="pay-box" id="upiBox" onclick="selectUPI()">
+      <b>UPI</b>
+      <p style="font-size:13px;opacity:.7">
+        Pay using GPay / PhonePe / Paytm
+      </p>
+    </div>
+
+    <button class="btn" id="payBtn" style="display:none" onclick="payUPI()">
+      Pay via UPI
+    </button>
+
+    <button class="btn" onclick="closePop()">Close</button>
+  </div>
+</div>
+
+<script>
+let basePrice=0;
+let finalPrice=0;
+let itemName="";
+
+function buy(name,price){
+  itemName=name;
+  basePrice=price;
+  finalPrice=price;
+  document.getElementById("item").innerText=name;
+  document.getElementById("price").innerText=price.toFixed(2);
+  document.getElementById("popup").style.display="flex";
+  document.getElementById("payBtn").style.display="none";
+  document.getElementById("upiBox").classList.remove("active");
+}
+
+function closePop(){
+  document.getElementById("popup").style.display="none";
+}
+
+function applyCoupon(){
+  let c=document.getElementById("coupon").value.trim();
+  finalPrice=basePrice;
+  if(c==="FURIOUSMCOP") finalPrice*=0.8;
+  if(c==="NEWARC") finalPrice*=0.9;
+  document.getElementById("price").innerText=finalPrice.toFixed(2);
+}
+
+function selectUPI(){
+  document.getElementById("upiBox").classList.add("active");
+  document.getElementById("payBtn").style.display="block";
+}
+
+function payUPI(){
+  let upiId="9864149985@fam";
+  let name="FuriousMC";
+  let url=
+    "upi://pay?pa="+upiId+
+    "&pn="+name+
+    "&am="+finalPrice.toFixed(2)+
+    "&cu=USD"+
+    "&tn="+encodeURIComponent(itemName);
+  window.location.href=url;
+}
+</script>
+
+</body>
+</html>
